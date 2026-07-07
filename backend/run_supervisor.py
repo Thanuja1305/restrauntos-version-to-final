@@ -59,7 +59,7 @@ def kill_process_on_port(port: int):
     """Locates and terminates any process currently bound to the target port."""
     log_info(f"Checking for existing processes on port {port}...")
     for conn in psutil.net_connections(kind="inet"):
-        if conn.lport == port and conn.status == "LISTEN":
+        if conn.laddr and conn.laddr.port == port and conn.status == "LISTEN":
             pid = conn.pid
             if pid:
                 try:
