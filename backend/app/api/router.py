@@ -6,7 +6,7 @@ from backend.app import schemas
 from backend.app.agents.auth import AuthAgent
 from backend.app.agents.database_agent import DatabaseAgent
 from backend.app.agents.sales import SalesAgent
-from backend.app.agents.inventory import InventoryAgent
+from backend.app.agents.inventory_agent import InventoryAgent
 from backend.app.agents.analytics import AnalyticsAgent
 from backend.app.agents.notification import NotificationAgent
 from backend.app.agents.orchestrator import OrchestratorAgent
