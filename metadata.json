@@ -1,0 +1,6 @@
+{
+  "name": "RestaurantOS AI",
+  "description": "A premium, production-ready AI Operating System for restaurant owners to manage orders, inventory, finances, menu, and suppliers through natural language conversation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
