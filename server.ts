@@ -1174,9 +1174,12 @@ Just describe what you need, and I'll update the menus, orders, customers, and a
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+  if (!process.env.VERCEL) {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  }
+  return app;
 }
 
-startServer();
+export const appPromise = startServer();
