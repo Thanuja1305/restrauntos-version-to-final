@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RestaurantOS AI - Multi-Agent Playground</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-primary: #6366f1;
+            --accent-secondary: #a855f7;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(11, 15, 25, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-badge {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: white;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .app-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: var(--accent-success);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-success);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        main {
+            flex: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 1.75rem;
+            backdrop-filter: blur(16px);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input, select, textarea {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .suggestion-chip {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            display: block;
+            width: 100%;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .suggestion-chip:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+            transform: translateX(2px);
+        }
+
+        .workspace-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .chat-input-wrapper {
+            position: relative;
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .chat-input-wrapper textarea {
+            flex: 1;
+            height: 60px;
+            resize: none;
+            padding-right: 3.5rem;
+            line-height: 1.4;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            color: white;
+            padding: 0 1.5rem;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .output-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            min-height: 300px;
+        }
+
+        .node-flow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .flow-node {
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .flow-node.active {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .flow-node.completed {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--accent-success);
+            color: var(--accent-success);
+        }
+
+        .summary-box {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            padding: 1.25rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 4px solid var(--accent-primary);
+            border-radius: 0 12px 12px 0;
+            color: var(--text-primary);
+        }
+
+        .summary-box.handoff {
+            border-left-color: var(--accent-warning);
+            background: rgba(245, 158, 11, 0.03);
+        }
+
+        .metric-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+        }
+
+        .results-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--accent-warning);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .placeholder-message {
+            text-align: center;
+            color: var(--text-secondary);
+            margin: auto;
+            font-size: 0.95rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .loader {
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+            margin: auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.9); }
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .meta-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            padding: 0.75rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .meta-val {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin-top: 0.25rem;
+        }
+
+        .json-viewer {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 12px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-height: 250px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <div class="logo-badge">R</div>
+            <h1>RestaurantOS AI <span style="font-weight:300; font-size:1.1rem; color:var(--text-secondary);">| Multi-Agent Sandbox</span></h1>
+        </div>
+        <div style="display:flex; align-items:center; gap:1rem;">
+            <a href="/standard" target="_blank" style="color:var(--accent-primary); text-decoration:none; font-size:0.9rem; font-weight:600; border:1px solid rgba(99, 102, 241, 0.2); padding:0.4rem 0.8rem; border-radius:20px; transition:all 0.2s; background:rgba(99, 102, 241, 0.05);" onmouseover="this.style.background='rgba(99, 102, 241, 0.15)'" onmouseout="this.style.background='rgba(99, 102, 241, 0.05)'">
+                📖 Architecture Standard
+            </a>
+            <div class="app-status">
+                <div class="status-dot"></div>
+                <span>Inventory Agent Online</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Sidebar Panel -->
+        <div class="panel">
+            <h2>Configuration</h2>
+            <div class="form-group">
+                <label for="restaurantId">Restaurant ID</label>
+                <input type="text" id="restaurantId" value="rest_test_123">
+            </div>
+            <div class="form-group">
+                <label for="userRole">User Role</label>
+                <select id="userRole">
+                    <option value="owner">Owner / Admin</option>
+                    <option value="manager">Manager</option>
+                    <option value="staff" selected>Kitchen Staff</option>
+                </select>
+            </div>
+            
+            <h2>Sample Queries</h2>
+            <div class="form-group">
+                <button class="suggestion-chip" onclick="setQuery('Check stock levels for Tomato')">
+                    🔍 Check Tomato stock levels
+                </button>
+                <button class="suggestion-chip" onclick="setQuery('What items are low on stock?')">
+                    ⚠️ View low stock alerts
+                </button>
+                <button class="suggestion-chip" onclick="setQuery('Which items are out of stock?')">
+                    🚨 View out of stock ingredients
+                </button>
+                <button class="suggestion-chip" onclick="setQuery('Show expiring ingredient batches')">
+                    📅 Track expiring batches
+                </button>
+                <button class="suggestion-chip" onclick="setQuery('Retrieve suppliers list')">
+                    📦 Fetch supplier directory
+                </button>
+                <button class="suggestion-chip" onclick="setQuery('Calculate profit margin for last month')">
+                    💸 Trigger Finance Handoff query
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="panel workspace-panel">
+            <h2>Agent Execution Environment</h2>
+            
+            <!-- Input Area -->
+            <div class="chat-input-wrapper">
+                <textarea id="queryInput" placeholder="Ask the agent anything about the restaurant inventory..."></textarea>
+                <button class="submit-btn" id="sendBtn" onclick="submitQuery()">Execute</button>
+            </div>
+
+            <!-- Flow Visualizer -->
+            <div class="node-flow" id="nodeFlow" style="display:none;">
+                <div class="flow-node" id="node-input">Input Layer</div>
+                <div class="flow-node" id="node-intent">Intent Engine</div>
+                <div class="flow-node" id="node-context">Context Builder</div>
+                <div class="flow-node" id="node-planner">Stock Planner</div>
+                <div class="flow-node" id="node-tools">Execute Tools</div>
+                <div class="flow-node" id="node-processing">Process Results</div>
+                <div class="flow-node" id="node-validation">Validation</div>
+                <div class="flow-node" id="node-response">Response Gen</div>
+            </div>
+
+            <!-- Loader -->
+            <div class="loader" id="loader"></div>
+
+            <!-- Output Display -->
+            <div class="output-card" id="outputCard">
+                <div class="placeholder-message" id="placeholder">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                    <span>Enter a query or select a sample configuration above to run the LangGraph workflow.</span>
+                </div>
+
+                <div class="results-container" id="results" style="display:none;">
+                    <!-- Metrics Bar -->
+                    <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; border-bottom:1px solid var(--border-color); padding-bottom:0.75rem;">
+                        <span class="metric-badge">
+                            Intent: <strong id="resIntent" style="color:var(--accent-primary); margin-left:0.25rem;">StockLookup</strong>
+                        </span>
+                        <span class="metric-badge">
+                            Confidence: <strong id="resConfidence" style="color:var(--accent-success); margin-left:0.25rem;">1.0</strong>
+                        </span>
+                        <span class="metric-badge">
+                            Time: <strong id="resTime" style="margin-left:0.25rem;">0.002s</strong>
+                        </span>
+                    </div>
+
+                    <!-- Final Summary -->
+                    <div class="summary-box" id="resSummary"></div>
+
+                    <!-- Structured Content Tables -->
+                    <div id="tableContainer"></div>
+
+                    <!-- Collapsible JSON Debug -->
+                    <div style="margin-top:1.5rem;">
+                        <button onclick="toggleJson()" style="background:none; border:none; color:var(--accent-primary); font-size:0.85rem; font-weight:600; cursor:pointer; text-transform:uppercase; display:flex; align-items:center; gap:0.25rem; padding:0;">
+                            <span id="jsonToggleBtn">▶ Show Raw API Payload</span>
+                        </button>
+                        <div class="json-viewer" id="resJson" style="display:none; margin-top:0.5rem;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function setQuery(text) {
+            document.getElementById('queryInput').value = text;
+        }
+
+        async function submitQuery() {
+            const query = document.getElementById('queryInput').value.trim();
+            if (!query) return;
+
+            const restaurantId = document.getElementById('restaurantId').value;
+            const userRole = document.getElementById('userRole').value;
+
+            // Reset UI
+            document.getElementById('placeholder').style.display = 'none';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('loader').style.display = 'block';
+            
+            // Show & reset flow visualizer nodes
+            const nodeFlow = document.getElementById('nodeFlow');
+            nodeFlow.style.display = 'flex';
+            const nodes = ['input', 'intent', 'context', 'planner', 'tools', 'processing', 'validation', 'response'];
+            nodes.forEach(n => {
+                const el = document.getElementById(`node-${n}`);
+                el.className = 'flow-node';
+            });
+
+            // Random UUIDs for tracing
+            const reqId = 'req_' + Math.random().toString(36).substr(2, 9);
+            const wfId = 'wf_' + Math.random().toString(36).substr(2, 9);
+            const sessId = 'sess_xyz';
+            const convId = 'conv_abc';
+
+            // Function to highlight node steps sequentially in UI to mock state tracing
+            function animateNodes(history) {
+                let delay = 0;
+                history.forEach((histItem) => {
+                    let targetNode = null;
+                    if (histItem.includes('input_layer')) targetNode = 'input';
+                    else if (histItem.includes('intent_engine')) targetNode = 'intent';
+                    else if (histItem.includes('context_builder')) targetNode = 'context';
+                    else if (histItem.includes('stock_planner')) targetNode = 'planner';
+                    else if (histItem.includes('execute_tools')) targetNode = 'tools';
+                    else if (histItem.includes('process_results')) targetNode = 'processing';
+                    else if (histItem.includes('validate_output')) targetNode = 'validation';
+                    else if (histItem.includes('response_generated')) targetNode = 'response';
+
+                    if (targetNode) {
+                        setTimeout(() => {
+                            document.getElementById(`node-${targetNode}`).className = 'flow-node completed';
+                        }, delay);
+                        delay += 300;
+                    }
+                });
+            }
+
+            try {
+                const response = await fetch('/agents/inventory/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        request_id: reqId,
+                        workflow_id: wfId,
+                        restaurant_id: restaurantId,
+                        session_id: sessId,
+                        conversation_id: convId,
+                        shared_context: {
+                            user_role: userRole
+                        },
+                        query: query
+                    })
+                });
+
+                const data = await response.json();
+                
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('results').style.display = 'flex';
+
+                // Display Meta
+                document.getElementById('resIntent').innerText = data.intent;
+                document.getElementById('resConfidence').innerText = (data.confidence * 100).toFixed(0) + '%';
+                document.getElementById('resTime').innerText = data.execution_time.toFixed(4) + 's';
+
+                // Display Summary
+                const summaryBox = document.getElementById('resSummary');
+                summaryBox.innerText = data.summary;
+                if (data.status === 'handoff') {
+                    summaryBox.className = 'summary-box handoff';
+                } else {
+                    summaryBox.className = 'summary-box';
+                }
+
+                // Render Table details dynamically based on structured data shape
+                const tableContainer = document.getElementById('tableContainer');
+                tableContainer.innerHTML = '';
+
+                // Build custom visual lists or tables depending on fields returned
+                if (data.structured_data.items && data.structured_data.items.length > 0) {
+                    let html = '<table><thead><tr><th>Ingredient</th><th>Quantity</th><th>Unit</th><th>Safety Stock</th><th>Cost</th></tr></thead><tbody>';
+                    data.structured_data.items.forEach(item => {
+                        html += `<tr>
+                            <td><strong>${item.ingredient_name}</strong></td>
+                            <td>${item.quantity}</td>
+                            <td>${item.unit}</td>
+                            <td>${item.safety_stock || item.reorder_point}</td>
+                            <td>$${(item.cost_per_unit || 0).toFixed(2)}</td>
+                        </tr>`;
+                    });
+                    html += '</tbody></table>';
+                    tableContainer.innerHTML = html;
+                } else if (data.structured_data.low_stock_items && data.structured_data.low_stock_items.length > 0) {
+                    let html = '<table><thead><tr><th>Low Stock Ingredient</th><th>Quantity</th><th>Reorder Level</th><th>Status</th></tr></thead><tbody>';
+                    data.structured_data.low_stock_items.forEach(item => {
+                        html += `<tr>
+                            <td><strong>${item.ingredient_name}</strong></td>
+                            <td>${item.quantity}</td>
+                            <td>${item.reorder_point}</td>
+                            <td><span class="badge badge-warning">Low Stock</span></td>
+                        </tr>`;
+                    });
+                    html += '</tbody></table>';
+                    tableContainer.innerHTML = html;
+                } else if (data.structured_data.out_of_stock_items && data.structured_data.out_of_stock_items.length > 0) {
+                    let html = '<table><thead><tr><th>Out of Stock Ingredient</th><th>Quantity</th><th>Status</th></tr></thead><tbody>';
+                    data.structured_data.out_of_stock_items.forEach(item => {
+                        html += `<tr>
+                            <td><strong>${item.ingredient_name}</strong></td>
+                            <td>${item.quantity}</td>
+                            <td><span class="badge badge-danger">Out of Stock</span></td>
+                        </tr>`;
+                    });
+                    html += '</tbody></table>';
+                    tableContainer.innerHTML = html;
+                } else if (data.structured_data.suppliers && data.structured_data.suppliers.length > 0) {
+                    let html = '<table><thead><tr><th>Supplier Name</th><th>Contact</th><th>Email</th><th>Lead Time</th><th>Rating</th></tr></thead><tbody>';
+                    data.structured_data.suppliers.forEach(item => {
+                        html += `<tr>
+                            <td><strong>${item.name}</strong></td>
+                            <td>${item.contact_name || ''}</td>
+                            <td>${item.email || ''}</td>
+                            <td>${item.lead_time_days} days</td>
+                            <td><span class="badge badge-success">⭐ ${item.rating.toFixed(1)}</span></td>
+                        </tr>`;
+                    });
+                    html += '</tbody></table>';
+                    tableContainer.innerHTML = html;
+                }
+
+                // Render JSON dump
+                document.getElementById('resJson').innerText = JSON.stringify(data, null, 2);
+
+                // Run node transition animation based on trace history
+                // We'll mock execution steps sequentially matching the trace
+                const mockHistory = ["input_layer", "intent_engine", "context_builder", "stock_planner", "execute_tools", "process_results", "validate_output", "response_generated"];
+                animateNodes(data.status === 'handoff' ? ["input_layer", "intent_engine", "response_generated"] : mockHistory);
+
+            } catch (err) {
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('placeholder').style.display = 'flex';
+                document.getElementById('placeholder').innerHTML = `<span style="color:var(--accent-danger);">Error connecting to agent backend service. Make sure server is running.</span>`;
+                console.error(err);
+            }
+        }
+
+        function toggleJson() {
+            const el = document.getElementById('resJson');
+            const btn = document.getElementById('jsonToggleBtn');
+            if (el.style.display === 'none') {
+                el.style.display = 'block';
+                btn.innerText = '▼ Hide Raw API Payload';
+            } else {
+                el.style.display = 'none';
+                btn.innerText = '▶ Show Raw API Payload';
+            }
+        }
+    </script>
+</body>
+</html>

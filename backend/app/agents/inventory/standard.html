@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RestaurantOS AI - Multi-Agent Engineering Standard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Space+Grotesk:wght@400;700&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --sidebar-bg: rgba(17, 24, 39, 0.8);
+            --content-bg: #111827;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-primary: #6366f1;
+            --accent-secondary: #a855f7;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --code-bg: #1f2937;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+        }
+
+        @media (max-width: 900px) {
+            body {
+                grid-template-columns: 1fr;
+            }
+            aside {
+                display: none;
+            }
+        }
+
+        /* Sidebar styling */
+        aside {
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            backdrop-filter: blur(16px);
+            padding: 2rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo-badge {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: white;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .logo-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .toc-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .toc-item a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: block;
+            padding: 0.25rem 0;
+        }
+
+        .toc-item a:hover {
+            color: var(--accent-primary);
+            transform: translateX(4px);
+        }
+
+        .toc-item.active a {
+            color: var(--text-primary);
+            font-weight: 700;
+            border-left: 2px solid var(--accent-primary);
+            padding-left: 0.5rem;
+        }
+
+        /* Content area styling */
+        article {
+            padding: 3.5rem 4.5rem;
+            max-width: 1000px;
+            overflow-y: auto;
+            line-height: 1.7;
+        }
+
+        @media (max-width: 600px) {
+            article {
+                padding: 2rem;
+            }
+        }
+
+        .meta-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .meta-badge {
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-top: 3.5rem;
+            margin-bottom: 1.25rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+            color: var(--text-secondary);
+        }
+
+        ul, ol {
+            margin-bottom: 1.25rem;
+            padding-left: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .callout {
+            background: rgba(99, 102, 241, 0.05);
+            border-left: 4px solid var(--accent-primary);
+            padding: 1.25rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1.5rem 0;
+        }
+
+        .callout-title {
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .callout-warning {
+            border-left-color: var(--accent-warning);
+            background: rgba(245, 158, 11, 0.03);
+        }
+
+        .callout-danger {
+            border-left-color: var(--accent-danger);
+            background: rgba(239, 68, 68, 0.03);
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+            background: var(--code-bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #f472b6;
+        }
+
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            padding: 1.25rem;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        pre code {
+            color: var(--text-primary);
+            background: none;
+            padding: 0;
+            font-size: 0.85rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            text-align: left;
+            border-bottom: 2px solid var(--border-color);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .diagram {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-family: monospace;
+            white-space: pre;
+            overflow-x: auto;
+            line-height: 1.4;
+            color: #818cf8;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <aside>
+        <a href="/" class="logo-container">
+            <div class="logo-badge">R</div>
+            <div class="logo-title">RestaurantOS</div>
+        </a>
+        <ul class="toc-menu">
+            <li class="toc-item active"><a href="#objective">1. System Objective</a></li>
+            <li class="toc-item"><a href="#principles">2. Architecture Principles</a></li>
+            <li class="toc-item"><a href="#architecture">3. Overall System Architecture</a></li>
+            <li class="toc-item"><a href="#agent-standard">4. Agent Development Standard</a></li>
+            <li class="toc-item"><a href="#domain-matrix">5. Domain Responsibility Matrix</a></li>
+            <li class="toc-item"><a href="#orchestrator-design">6. Orchestrator Design</a></li>
+            <li class="toc-item"><a href="#request-lifecycle">7. Request Lifecycle</a></li>
+            <li class="toc-item"><a href="#tool-architecture">8. Tool Architecture</a></li>
+            <li class="toc-item"><a href="#rules-engine">9. Business Rule Engine</a></li>
+            <li class="toc-item"><a href="#llm-standard">10. LLM Design Standard</a></li>
+            <li class="toc-item"><a href="#prompt-standard">11. Prompt Standard</a></li>
+            <li class="toc-item"><a href="#memory-architecture">12. Memory Architecture</a></li>
+            <li class="toc-item"><a href="#api-contracts">13. API Contracts</a></li>
+            <li class="toc-item"><a href="#error-handling">14. Error Handling Standard</a></li>
+            <li class="toc-item"><a href="#observability">15. Observability</a></li>
+            <li class="toc-item"><a href="#security">16. Security Standards</a></li>
+            <li class="toc-item"><a href="#testing">17. Testing Strategy</a></li>
+            <li class="toc-item"><a href="#versioning">18. Agent Versioning</a></li>
+        </ul>
+    </aside>
+
+    <article>
+        <div class="meta-header">
+            <span class="meta-badge">Version 1.0 (Enterprise Specification)</span>
+            <h1>Multi-Agent Engineering Standard</h1>
+            <p style="font-size: 1.1rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                RestaurantOS AI Platform Foundations & Architecture Contracts
+            </p>
+        </div>
+
+        <section id="objective">
+            <h2>1. System Objective</h2>
+            <p>
+                RestaurantOS AI is a modular, multi-agent operating system designed to run restaurant operations at scale. The platform utilizes a centralized Orchestrator Agent to manage user interface requests and route tasks to specialized domain-specific agents:
+            </p>
+            <ul>
+                <li><strong>Sales Agent</strong>: Handles orders, menus, revenue transactions, and customers.</li>
+                <li><strong>Inventory Agent</strong>: Manages ingredient availability, stock adjustments, expiry tracking, and suppliers.</li>
+                <li><strong>Finance Agent</strong>: Manages expenses, bills, profit margins, invoices, and payment tracking.</li>
+                <li><strong>Support Agent</strong>: Oversees ticketing, FAQs, and WhatsApp external helpdesk inquiries.</li>
+                <li><strong>Analytics Agent</strong>: Provides operation performance insights, trends, and KPIs.</li>
+            </ul>
+        </section>
+
+        <section id="principles">
+            <h2>2. Primary Architecture Principles</h2>
+            <div class="callout">
+                <div class="callout-title">Core Standards</div>
+                <p>All modules and developer integrations must comply with these architectural properties:</p>
+            </div>
+            <ul>
+                <li><strong>Single Responsibility Principle</strong>: Each agent owns exactly one domain. For example, the Inventory Agent is forbidden from calculating order sales profit margins.</li>
+                <li><strong>Contract-First Development</strong>: Rigid JSON Pydantic schemas must define inputs and outputs for every layer.</li>
+                <li><strong>Stateless Core</strong>: Agents execute statelessly. Short-term and long-term state updates are persisted in a centralized relational database.</li>
+                <li><strong>Deterministic Business Logic</strong>: No LLM should perform mathematical operations or query databases directly. All arithmetic must happen within a central code-based Business Rule Engine.</li>
+            </ul>
+        </section>
+
+        <section id="architecture">
+            <h2>3. Overall System Architecture</h2>
+            <p>The system is organized into decoupled layers, guaranteeing strict unidirectional data flow:</p>
+            <div class="diagram">
+👨🍳 Restaurant Owner
+       │
+       ▼
+Dashboard UI / WhatsApp
+       │
+       ▼
+Orchestrator Agent (Session & Intent Router)
+       │
+       ▼
+LangGraph Workflow Engine
+       │
+       ▼
+Specialized Domain Agents (Sales / Inventory / Finance)
+       │
+       ▼
+Shared Tool Registry (Predefined Database API hooks)
+       │
+       ▼
+Business Rule Engine (Deterministic Calculations)
+       │
+       ▼
+Repository Layer (SQLAlchemy ORM)
+       │
+       ▼
+PostgreSQL / Supabase Database
+            </div>
+        </section>
+
+        <section id="agent-standard">
+            <h2>4. Agent Development Standard</h2>
+            <p>Every specialized agent must implement a uniform execution pipeline containing these components:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pipeline Stage</th>
+                        <th>Responsibility</th>
+                        <th>Allowed Operations</th>
+                        <th>Forbidden Operations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Input Layer</strong></td>
+                        <td>Validates orchestrator schema, maps traces.</td>
+                        <td>Pydantic check, context validation.</td>
+                        <td>Modifying database records.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Intent Engine</strong></td>
+                        <td>Classifies domain intent (e.g. StockLookup, ExpenseQuery).</td>
+                        <td>Matches query keywords & LLM intents.</td>
+                        <td>Direct SQL execution.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Context Builder</strong></td>
+                        <td>Enriches queries with configurations.</td>
+                        <td>Loads local timezone, currency, thresholds.</td>
+                        <td>Arithmetic calculations.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Stock Planner</strong></td>
+                        <td>Builds sequential tasks plan.</td>
+                        <td>Decides tool call chains.</td>
+                        <td>Running math formulas.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tool Router & Exec</strong></td>
+                        <td>Triggers selected tools.</td>
+                        <td>Invokes predefined SQL / Stock / Billing functions.</td>
+                        <td>Raw/ad-hoc SQL generation.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Business Rule Engine</strong></td>
+                        <td>Executes math computations.</td>
+                        <td>Calculates formulas (e.g., turnover, margins).</td>
+                        <td>Guessing metrics.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Response Generator</strong></td>
+                        <td>Translates results into human-friendly text.</td>
+                        <td>Summarizes metrics using Gemini templates.</td>
+                        <td>Leaking database PKs.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="domain-matrix">
+            <h2>5. Domain Responsibility Matrix</h2>
+            <p>We enforce explicit domain boundaries between agent capabilities:</p>
+            <ul>
+                <li><strong>Sales Agent</strong>: Owns menus, orders, sales transaction invoices, and customer registry.</li>
+                <li><strong>Inventory Agent</strong>: Owns ingredients, current stock, reorder suggestions, expiry alerts, and suppliers.</li>
+                <li><strong>Finance Agent</strong>: Owns utility costs, payroll expense calculations, vendor billing, outstanding debts, and margins.</li>
+                <li><strong>Support Agent</strong>: Owns tickets, conversational memory, and opening hours FAQs.</li>
+            </ul>
+            <div class="callout callout-warning">
+                <div class="callout-title">Handoff Rule</div>
+                <p>If an agent classifies an intent belonging to another domain (e.g. Inventory Agent receives a request to compare last month's salaries), it must stop processing and return a handoff structure: <code>{"status": "handoff", "target_agent": "finance", "reason": "..."}</code>.</p>
+            </div>
+        </section>
+
+        <section id="orchestrator-design">
+            <h2>6. Orchestrator Design</h2>
+            <p>
+                The Orchestrator Agent is the central coordinator. It determines if a query is a Single Agent request, a Multiple Agents workflow (calling them sequentially or in parallel), or a Fallback. It handles session management, context sharing, timeout thresholds, and error recovery across domain layers.
+            </p>
+        </section>
+
+        <section id="request-lifecycle">
+            <h2>7. Request Lifecycle</h2>
+            <p>Every transaction triggers a strict lifecycle path:</p>
+            <ol>
+                <li>Owner sends message via interface (Dashboard/WhatsApp).</li>
+                <li>API Gateway authenticates token and routes to Orchestrator.</li>
+                <li>Orchestrator performs intent detection and spawns appropriate Agent Graph.</li>
+                <li>Agent executes Input -> Intent -> Planner -> Tools.</li>
+                <li>Tools query PostgreSQL via SQLAlchemy.</li>
+                <li>Calculations are solved inside the Business Rules Engine.</li>
+                <li>Validation verifies schemas, and outputs are aggregated by Orchestrator.</li>
+            </ol>
+        </section>
+
+        <section id="tool-architecture">
+            <h2>8. Tool Architecture</h2>
+            <p>All database accesses must use predefined methods in the Shared Tool Registry. Raw SQL generation is strictly prohibited.</p>
+            <pre><code># Sample Allowed Tool Interface
+class InventorySQLTool:
+    async def getLowStockItems(self, restaurant_id: str) -> List[Dict[str, Any]]:
+        # Queries repository layer using ORM select statements
+        ...</code></pre>
+        </section>
+
+        <section id="rules-engine">
+            <h2>9. Centralized Business Rule Engine</h2>
+            <p>All business calculations must reside in code (Python) and never be calculated by the LLM. Key formulas include:</p>
+            <ul>
+                <li><code>Net Profit = Revenue - Cost of Goods Sold - Operating Expenses</code></li>
+                <li><code>Inventory Value = Sum(Stock Quantity * Cost Per Unit)</code></li>
+                <li><code>Stock Turnover Rate = Cost of Goods Sold / Average Inventory Value</code></li>
+            </ul>
+        </section>
+
+        <section id="llm-standard">
+            <h2>10. LLM Design Standard</h2>
+            <p>The reasoning model (Gemini) must be configured with a low temperature (<code>0.1</code>) to ensure deterministic outputs. The LLM is strictly prohibited from guessing order details, creating raw database commands, or bypassing safety validations.</p>
+        </section>
+
+        <section id="prompt-standard">
+            <h2>11. Prompt Engineering Standard</h2>
+            <p>Prompts are dynamically assembled on each request. The structure must isolate System Instructions (defining safety constraints) from Context Variables (timezone, conversation logs) and Few-shot Examples.</p>
+        </section>
+
+        <section id="memory-architecture">
+            <h2>12. Memory Architecture</h2>
+            <p>The Support Agent retains session conversation memory to track client requests. Specialized domain agents like Inventory and Finance must remain stateless, writing execution histories only to database transaction logs.</p>
+        </section>
+
+        <section id="api-contracts">
+            <h2>13. API Contracts</h2>
+            <p>Every specialized agent must return a standardized response matching the following schema:</p>
+            <pre><code>{
+  "agent": "inventory",
+  "status": "success | handoff | error",
+  "intent": "StockLookup",
+  "summary": "Tomato stock level is 2.5 kg.",
+  "confidence": 1.0,
+  "structured_data": {
+    "items": [
+      {
+        "ingredient_name": "Tomato",
+        "quantity": 2.5,
+        "unit": "kg"
+      }
+    ]
+  },
+  "execution_time": 0.0125,
+  "tool_usage": ["InventorySQLTool.getCurrentStock"],
+  "errors": []
+}</code></pre>
+        </section>
+
+        <section id="error-handling">
+            <h2>14. Error Handling Standard</h2>
+            <p>Exceptions must be trapped at the node layer, registering errors into the state's <code>errors</code> array rather than raising HTTP 500 crashes. The router maps domain exceptions to standard error codes (e.g. <code>DATABASE_UNAVAILABLE</code>, <code>VALIDATION_ERROR</code>).</p>
+        </section>
+
+        <section id="observability">
+            <h2>15. Observability</h2>
+            <p>Each node execution must write structured JSON log entries tracking the Request ID, Workflow ID, node name, elapsed latency, and token consumption metrics.</p>
+        </section>
+
+        <section id="security">
+            <h2>16. Security Standards</h2>
+            <p>Ensure strict multi-tenant isolation. Every database query must bind the <code>restaurant_id</code> retrieved from verified session metadata, preventing cross-tenant data leaks.</p>
+        </section>
+
+        <section id="testing">
+            <h2>17. Testing Strategy</h2>
+            <p>Unit and integration tests must run against isolated databases. LLM intent engines must be tested for prompt injections, and business calculations must be tested for numerical correctness using pytest.</p>
+        </section>
+
+        <section id="versioning">
+            <h2>18. Agent Versioning</h2>
+            <p>The system is decoupled using API gateways. New agents (e.g., Marketing, HR) can be added as microservices by registering their intent triggers in the Orchestrator without modifying the existing Inventory or Sales agents.</p>
+        </section>
+    </article>
+
+    <script>
+        // Simple active item highlighting on scroll
+        const sections = document.querySelectorAll('section');
+        const navItems = document.querySelectorAll('.toc-item');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 120) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.querySelector('a').getAttribute('href').slice(1) === current) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
