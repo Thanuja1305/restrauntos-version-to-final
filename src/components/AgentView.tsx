@@ -390,7 +390,7 @@ export default function AgentView({
                       </div>
 
                       {/* Interactive Confirmation Box for Create Orders */}
-                      {isAI && msg.text.includes("Order") && msg.text.includes("Created Successfully") && (
+                      {isAI && msg.text && msg.text.includes("Order") && msg.text.includes("Created Successfully") && (
                         <div className="bg-white border border-zinc-200 rounded-[14px] p-3 shadow-xs max-w-sm flex items-center justify-between gap-3 animate-fade-in">
                           <div className="flex items-center gap-2 text-xs">
                             <span className="w-6 h-6 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">

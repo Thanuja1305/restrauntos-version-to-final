@@ -9,6 +9,7 @@ import FinanceView from "./components/FinanceView";
 import AnalyticsView from "./components/AnalyticsView";
 import SettingsView from "./components/SettingsView";
 import LoginView from "./components/LoginView";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { Bot, RefreshCw } from "lucide-react";
 
 export default function App() {
@@ -215,60 +216,72 @@ export default function App() {
     switch (activeTab) {
       case "agent":
         return (
-          <AgentView 
-            messages={messages} 
-            onSendMessage={handleSendMessage} 
-            isSending={isSending} 
-            onTriggerPrompt={handleTriggerPrompt}
-            restaurantState={restaurantState}
-            onResetDatabase={handleResetDatabase}
-          />
+          <ErrorBoundary>
+            <AgentView 
+              messages={messages} 
+              onSendMessage={handleSendMessage} 
+              isSending={isSending} 
+              onTriggerPrompt={handleTriggerPrompt}
+              restaurantState={restaurantState}
+              onResetDatabase={handleResetDatabase}
+            />
+          </ErrorBoundary>
         );
       case "inventory":
         return (
-          <InventoryView 
-            inventory={restaurantState.inventory} 
-            suppliers={restaurantState.suppliers}
-            menu={restaurantState.menu}
-            orders={restaurantState.orders}
-            onUpdateInventory={(inventory: InventoryItem[]) => syncStateWithServer({ ...restaurantState, inventory })}
-            onUpdateMenu={(menu: MenuItem[]) => syncStateWithServer({ ...restaurantState, menu })}
-            onUpdateOrders={(orders: Order[]) => syncStateWithServer({ ...restaurantState, orders })}
-            onUpdateState={(updatedState: RestaurantState) => syncStateWithServer(updatedState)}
-            onAddLog={handleAddFinancialLog}
-          />
+          <ErrorBoundary>
+            <InventoryView 
+              inventory={restaurantState.inventory} 
+              suppliers={restaurantState.suppliers}
+              menu={restaurantState.menu}
+              orders={restaurantState.orders}
+              onUpdateInventory={(inventory: InventoryItem[]) => syncStateWithServer({ ...restaurantState, inventory })}
+              onUpdateMenu={(menu: MenuItem[]) => syncStateWithServer({ ...restaurantState, menu })}
+              onUpdateOrders={(orders: Order[]) => syncStateWithServer({ ...restaurantState, orders })}
+              onUpdateState={(updatedState: RestaurantState) => syncStateWithServer(updatedState)}
+              onAddLog={handleAddFinancialLog}
+            />
+          </ErrorBoundary>
         );
       case "sales":
         return (
-          <SalesView 
-            orders={restaurantState.orders} 
-            menu={restaurantState.menu}
-            customers={restaurantState.customers}
-            inventory={restaurantState.inventory}
-            onUpdateState={(updatedState: RestaurantState) => syncStateWithServer(updatedState)}
-            onUpdateOrders={(orders: Order[]) => syncStateWithServer({ ...restaurantState, orders })}
-            onAddLog={handleAddFinancialLog}
-            setActiveTab={setActiveTab}
-          />
+          <ErrorBoundary>
+            <SalesView 
+              orders={restaurantState.orders} 
+              menu={restaurantState.menu}
+              customers={restaurantState.customers}
+              inventory={restaurantState.inventory}
+              onUpdateState={(updatedState: RestaurantState) => syncStateWithServer(updatedState)}
+              onUpdateOrders={(orders: Order[]) => syncStateWithServer({ ...restaurantState, orders })}
+              onAddLog={handleAddFinancialLog}
+              setActiveTab={setActiveTab}
+            />
+          </ErrorBoundary>
         );
       case "finance":
         return (
-          <FinanceView 
-            finances={restaurantState.finances}
-            onAddLog={handleAddFinancialLog}
-          />
+          <ErrorBoundary>
+            <FinanceView 
+              finances={restaurantState.finances}
+              onAddLog={handleAddFinancialLog}
+            />
+          </ErrorBoundary>
         );
       case "analytics":
         return (
-          <AnalyticsView 
-            restaurantState={restaurantState}
-          />
+          <ErrorBoundary>
+            <AnalyticsView 
+              restaurantState={restaurantState}
+            />
+          </ErrorBoundary>
         );
       case "settings":
         return (
-          <SettingsView 
-            onResetDatabase={handleResetDatabase}
-          />
+          <ErrorBoundary>
+            <SettingsView 
+              onResetDatabase={handleResetDatabase}
+            />
+          </ErrorBoundary>
         );
       default:
         return (

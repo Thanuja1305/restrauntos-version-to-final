@@ -463,3 +463,37 @@ class DatabaseAgent:
                 n["status"] = "read"
                 return n
         return None
+
+    @staticmethod
+    async def settle_supplier_bill(supplier_id: str) -> bool:
+        try:
+            supabase.table("suppliers").update({"pending_payments": 0.0}).eq("id", supplier_id).execute()
+            supabase.table("bills").update({"status": "paid"}).eq("supplier_id", supplier_id).execute()
+        except Exception as e:
+            logger.warn(f"Supabase settle_supplier_bill failed: {e}")
+            
+        for s in _mock_db["suppliers"]:
+            if s["id"] == supplier_id:
+                s["pending_payments"] = 0.0
+        for b in _mock_db["bills"]:
+            if b["supplier_id"] == supplier_id:
+                b["status"] = "paid"
+        return True
+
+    @staticmethod
+    async def add_expense(category: str, amount: float, description: str) -> Dict[str, Any]:
+        exp_data = {
+            "id": f"f_{int(datetime.datetime.utcnow().timestamp())}",
+            "expense_date": datetime.datetime.utcnow().isoformat(),
+            "category": category,
+            "amount": amount,
+            "description": description
+        }
+        try:
+            supabase.table("expenses").insert(exp_data).execute()
+        except Exception as e:
+            logger.warn(f"Supabase add_expense failed: {e}")
+            
+        _mock_db["expenses"].insert(0, exp_data)
+        return exp_data
+

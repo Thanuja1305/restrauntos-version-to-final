@@ -186,8 +186,8 @@ class ChatRequest(BaseModel):
     message: str
 
 class ChatResponse(BaseModel):
-    userMessage: MessageSchema
-    agentMessage: MessageSchema
+    reply: str
+    updatedState: Optional[Dict[str, Any]] = None
 
 class ChatClearResponse(BaseModel):
     status: str = "ok"
