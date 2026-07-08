@@ -254,7 +254,7 @@ export default function SalesView({
     const stockStatus = checkStockStatus(currentMenuItemId, currentQuantity);
     if (!stockStatus.ok) {
       const proceed = window.confirm(
-        `⚠️ STOCK SHORTAGE WARNING!\n\nAdding ${currentQuantity}x "${menuItem.name}" requires ${stockStatus.deficit.toFixed(2)} ${stockStatus.unit} more "${stockStatus.ingredient}" than what's available in ingredients stock.\n\nOnly ~${stockStatus.maxPossible} portions can be cooked safely.\n\nDo you want to authorize this order anyway?`
+        `⚠️ STOCK SHORTAGE WARNING!\n\nAdding ${currentQuantity}x "${menuItem.name}" requires ${(stockStatus.deficit ?? 0).toFixed(2)} ${stockStatus.unit ?? ""} more "${stockStatus.ingredient ?? ""}" than what's available in ingredients stock.\n\nOnly ~${stockStatus.maxPossible ?? 0} portions can be cooked safely.\n\nDo you want to authorize this order anyway?`
       );
       if (!proceed) return;
     }

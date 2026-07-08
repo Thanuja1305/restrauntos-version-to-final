@@ -4,6 +4,6 @@
   "scripts": {
     "dev": "npm run dev --prefix frontend",
     "dev:backend": "python backend/run_supervisor.py",
-    "build": "cd frontend && npm install && npm run build && mv dist ../dist"
+    "build": "cd frontend && npm install && npm run build && node -e \"const fs = require('fs'); if (fs.existsSync('../dist')) { fs.rmSync('../dist', { recursive: true, force: true }); } fs.cpSync('dist', '../dist', { recursive: true }); fs.rmSync('dist', { recursive: true, force: true });\""
   }
 }
