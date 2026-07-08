@@ -263,6 +263,19 @@ Revenue KPI cards, profit margin analysis, top-selling items, and operational he
 
 ---
 
+## 👥 Team
+
+Built with 💚 by a passionate team for the AI Hackathon:
+
+| Name | Role |
+|---|---|
+| 👩‍💻 **Thanuja** | Full-Stack Lead · AI Integration · Backend Architecture |
+| 👩‍💻 **Shivani Gundlapalli** | Frontend Development · UI/UX Design |
+| 👩‍💻 **Akshitha Kota** | Backend Development · Database & API |
+| 👩‍💻 **Srija Reddy Mamidi** | AI Agent Design · Testing & QA |
+
+---
+
 ## 🙏 Acknowledgements
 
 - [Google Gemini AI](https://ai.google.dev) — AI Agent reasoning engine
@@ -278,6 +291,8 @@ Revenue KPI cards, profit margin analysis, top-selling items, and operational he
 <div align="center">
 
 **Built with ❤️ for the AI Hackathon**
+
+*Team RestaurantOS — Thanuja · Shivani · Akshitha · Srija*
 
 [🚀 Live Demo](https://restrauntos-version-to-final.vercel.app) • [🐛 Report Bug](https://github.com/Thanuja1305/restrauntos-version-to-final/issues) • [💡 Request Feature](https://github.com/Thanuja1305/restrauntos-version-to-final/issues)
 
