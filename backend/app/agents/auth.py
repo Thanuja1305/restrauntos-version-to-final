@@ -55,14 +55,16 @@ class AuthAgent:
         except Exception as e:
             logger.warn(f"Supabase login failed, trying fallback account. Info: {e}")
 
-        # 2. Fallback local account (owner@spiceheaven.com / password123)
-        if email_clean == "owner@spiceheaven.com" and password == "password123":
+        # 2. Fallback local account (owner@spiceheaven.com / password123 or admin@restaurantos.ai / restaurant123)
+        if (email_clean == "owner@spiceheaven.com" and password == "password123") or \
+           (email_clean == "admin@restaurantos.ai" and password == "restaurant123"):
+            is_owner = email_clean == "owner@spiceheaven.com"
             user_schema = {
-                "id": "usr_fallback_1",
-                "email": "owner@spiceheaven.com",
-                "firstName": "Spice",
-                "lastName": "Heaven",
-                "role": "owner",
+                "id": "usr_fallback_1" if is_owner else "usr_fallback_admin",
+                "email": email_clean,
+                "firstName": "Spice" if is_owner else "Admin",
+                "lastName": "Heaven" if is_owner else "User",
+                "role": "owner" if is_owner else "admin",
                 "isActive": True,
                 "createdAt": datetime.datetime.utcnow().isoformat()
             }
