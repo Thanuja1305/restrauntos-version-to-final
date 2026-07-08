@@ -10,6 +10,7 @@ class UserSchema(BaseModel):
     role: str = "staff"
     isActive: bool = True
     createdAt: str
+    name: Optional[str] = None
 
     class Config:
         populate_by_name = True
@@ -20,6 +21,7 @@ class LoginRequest(BaseModel):
     password: str
 
 class LoginResponse(BaseModel):
+    success: bool = True
     token: str
     user: UserSchema
 

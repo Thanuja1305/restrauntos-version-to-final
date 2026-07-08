@@ -152,3 +152,167 @@ async def submit_chat_message(payload: schemas.ChatRequest, user: Dict[str, Any]
 async def clear_chat(user: Dict[str, Any] = Depends(AuthAgent.verify_token)):
     history = await DatabaseAgent.clear_chat_history()
     return {"status": "ok", "chatHistory": history}
+
+# ==========================================
+# STATE & EXTRA ORDER ENDPOINTS
+# ==========================================
+
+def map_menu_item(m: Dict[str, Any]) -> Dict[str, Any]:
+    is_avail = m.get("is_available", m.get("isAvailable", True))
+    if "availability_status" in m:
+        is_avail = m["availability_status"] == "Available"
+    return {
+        "id": str(m.get("id")),
+        "name": m.get("name") or m.get("item_name") or "Unnamed Item",
+        "category": m.get("category", "Main Course"),
+        "price": float(m.get("price") or m.get("selling_price") or 0.0),
+        "cost": float(m.get("cost") or m.get("ingredient_cost") or (float(m.get("price") or m.get("selling_price") or 0.0) * 0.4)),
+        "status": "Available" if is_avail else "Sold Out",
+        "popularity": int(m.get("popularity", 4))
+    }
+
+def map_inventory_item(item: Dict[str, Any]) -> Dict[str, Any]:
+    ing = item.get("ingredients") or {}
+    return {
+        "id": str(item.get("id")),
+        "name": item.get("ingredientName") or ing.get("name") or item.get("name") or "Unnamed Ingredient",
+        "currentQty": float(item.get("currentStock") or item.get("current_qty") or item.get("currentQty") or 0.0),
+        "unit": item.get("unitOfMeasure") or ing.get("unit_of_measure") or item.get("unit") or "kg",
+        "reorderLevel": float(item.get("minStockLevel") or ing.get("min_stock_level") or item.get("reorderLevel") or 0.0),
+        "supplierId": item.get("supplierId") or ing.get("supplier_id") or item.get("supplier_id") or "s1",
+        "unitPrice": float(item.get("unitPrice") or item.get("unit_price") or ing.get("unit_price") or 10.0)
+    }
+
+def map_order(o: Dict[str, Any]) -> Dict[str, Any]:
+    raw_items = o.get("items") or []
+    items = []
+    for it in raw_items:
+        items.append({
+            "menuItemId": it.get("menuItemId") or it.get("menu_item_id") or it.get("menuId") or "",
+            "name": it.get("name") or it.get("menu_name") or it.get("menuName") or "Unnamed",
+            "quantity": int(it.get("quantity") or 1),
+            "price": float(it.get("price") or it.get("unitPrice") or it.get("unit_price") or 0.0)
+        })
+    
+    status_raw = o.get("status") or "Pending"
+    status = status_raw.capitalize()
+    
+    return {
+        "id": str(o.get("id")),
+        "customerName": o.get("customerName") or o.get("customer_name") or "Guest Customer",
+        "phone": o.get("phone") or "",
+        "tableOrType": o.get("tableOrType") or o.get("table_or_type") or "Table 1",
+        "items": items,
+        "subtotal": float(o.get("subtotal") or 0.0),
+        "tax": float(o.get("tax") or 0.0),
+        "total": float(o.get("total") or 0.0),
+        "status": status,
+        "timestamp": o.get("created_at") or o.get("createdAt") or datetime.datetime.utcnow().isoformat()
+    }
+
+def map_customer(c: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "id": str(c.get("id")),
+        "name": c.get("name") or "Unknown",
+        "phone": c.get("phone") or "",
+        "visitCount": int(c.get("visit_count") or c.get("visitCount") or 1),
+        "totalSpent": float(c.get("total_spent") or c.get("totalSpent") or 0.0),
+        "lastOrderDate": c.get("last_order_date") or c.get("lastOrderDate") or "",
+        "notes": c.get("notes") or ""
+    }
+
+def map_supplier(s: Dict[str, Any]) -> Dict[str, Any]:
+    items_supplied = s.get("items_supplied") or s.get("itemsSupplied") or []
+    if isinstance(items_supplied, str):
+        try:
+            import json
+            items_supplied = json.loads(items_supplied)
+        except Exception:
+            items_supplied = [items_supplied] if items_supplied else []
+            
+    return {
+        "id": str(s.get("id")),
+        "companyName": s.get("company_name") or s.get("companyName") or s.get("name") or "Unknown Company",
+        "contactPerson": s.get("contact_person") or s.get("contactPerson") or s.get("contact_name") or s.get("contactName") or "",
+        "phone": s.get("phone") or "",
+        "itemsSupplied": items_supplied,
+        "pendingPayments": float(s.get("pending_payments") or s.get("pendingPayments") or 0.0)
+    }
+
+def map_finance_entry_from_expense(e: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "id": str(e.get("id")),
+        "timestamp": e.get("expense_date") or e.get("expenseDate") or e.get("created_at") or datetime.datetime.utcnow().isoformat(),
+        "type": "Expense",
+        "category": e.get("category") or "Other",
+        "amount": float(e.get("amount") or 0.0),
+        "description": e.get("description") or ""
+    }
+
+def map_finance_entry_from_order(o: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "id": f"rev_{o.get('id')}",
+        "timestamp": o.get("created_at") or datetime.datetime.utcnow().isoformat(),
+        "type": "Income",
+        "category": "Order Revenue",
+        "amount": float(o.get("total") or 0.0),
+        "description": f"Completed Order {o.get('id')} for {o.get('customer_name') or 'Guest'}"
+    }
+
+@router.get("/state")
+async def get_state(user: Dict[str, Any] = Depends(AuthAgent.verify_token)):
+    try:
+        menu_items_raw = await DatabaseAgent.get_menu()
+        inventory_raw = await DatabaseAgent.get_inventory()
+        orders_raw = await DatabaseAgent.get_orders()
+        customers_raw = await DatabaseAgent.get_customers()
+        suppliers_raw = await DatabaseAgent.get_suppliers()
+        expenses_raw = await DatabaseAgent.get_expenses()
+        
+        menu = [map_menu_item(m) for m in menu_items_raw]
+        inventory = [map_inventory_item(i) for i in inventory_raw]
+        orders = [map_order(o) for o in orders_raw]
+        customers = [map_customer(c) for c in customers_raw]
+        suppliers = [map_supplier(s) for s in suppliers_raw]
+        
+        finances = []
+        for e in expenses_raw:
+            finances.append(map_finance_entry_from_expense(e))
+        for o in orders_raw:
+            if o.get("status") in ["completed", "Completed"]:
+                finances.append(map_finance_entry_from_order(o))
+                
+        finances.sort(key=lambda x: x["timestamp"], reverse=True)
+        
+        return {
+            "menu": menu,
+            "inventory": inventory,
+            "orders": orders,
+            "customers": customers,
+            "suppliers": suppliers,
+            "finances": finances
+        }
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/state/update")
+async def update_state(payload: Dict[str, Any] = Body(...), user: Dict[str, Any] = Depends(AuthAgent.verify_token)):
+    return payload
+
+@router.post("/state/reset")
+async def reset_state(user: Dict[str, Any] = Depends(AuthAgent.verify_token)):
+    return await get_state(user)
+
+@router.put("/orders/{order_id}")
+async def update_order(order_id: str, payload: Dict[str, Any] = Body(...), user: Dict[str, Any] = Depends(AuthAgent.verify_token)):
+    update_data = {}
+    if "status" in payload:
+        update_data["status"] = payload["status"].lower()
+        
+    updated = await DatabaseAgent.update_order(order_id, update_data)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Order not found")
+        
+    return map_order(updated)
