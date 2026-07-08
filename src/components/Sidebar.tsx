@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { 
   Bot, 
   ShoppingBag, 
@@ -6,9 +6,11 @@ import {
   Coins, 
   LineChart, 
   Settings, 
-  LogOut 
+  LogOut,
+  Menu,
+  X
 } from "lucide-react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 
 interface SidebarProps {
   activeTab: string;
@@ -22,6 +24,8 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ activeTab, setActiveTab, restaurantState, onLogout, user }: SidebarProps) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   const menuItems = [
     { id: "agent", label: "AI Agent", icon: Bot },
     { id: "inventory", label: "Inventory", icon: Warehouse, badge: restaurantState.inventory.filter(i => i.currentQty <= i.reorderLevel).length ? "Low" : undefined },
@@ -31,10 +35,15 @@ export default function Sidebar({ activeTab, setActiveTab, restaurantState, onLo
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
-  return (
-    <aside id="sidebar-container" className="w-[280px] bg-[#062C1A] text-zinc-100 flex flex-col justify-between shrink-0 h-full border-r border-white/5 font-sans relative z-10 select-none">
+  const handleTabSelect = (tab: string) => {
+    setActiveTab(tab);
+    setMobileOpen(false);
+  };
+
+  const SidebarContent = () => (
+    <aside id="sidebar-container" className="w-full bg-[#062C1A] text-zinc-100 flex flex-col justify-between h-full border-r border-white/5 font-sans relative z-10 select-none">
       {/* Top Brand Logo */}
-      <div className="p-6 pb-2">
+      <div className="p-6 pb-2 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-[#16A34A] rounded-[8px] flex items-center justify-center text-white font-bold shrink-0">
             <span className="font-bold text-base">R</span>
@@ -46,6 +55,14 @@ export default function Sidebar({ activeTab, setActiveTab, restaurantState, onLo
             <p className="text-[10px] text-white/50 font-medium tracking-wider uppercase mt-0.5">Manage • Serve • Grow</p>
           </div>
         </div>
+        {/* Close button on mobile */}
+        <button
+          onClick={() => setMobileOpen(false)}
+          className="lg:hidden p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+          aria-label="Close menu"
+        >
+          <X className="w-5 h-5" />
+        </button>
       </div>
 
       {/* Main Navigation links */}
@@ -57,7 +74,7 @@ export default function Sidebar({ activeTab, setActiveTab, restaurantState, onLo
           return (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => handleTabSelect(item.id)}
               className={`w-full flex items-center justify-between px-4 py-2.5 rounded-[12px] text-sm font-medium transition-all duration-200 relative group cursor-pointer ${
                 isActive 
                   ? "text-white font-semibold shadow-sm bg-white/10" 
@@ -135,5 +152,52 @@ export default function Sidebar({ activeTab, setActiveTab, restaurantState, onLo
         </div>
       </div>
     </aside>
+  );
+
+  return (
+    <>
+      {/* Mobile Hamburger Button — visible only on small screens */}
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="lg:hidden fixed top-3 left-3 z-50 w-10 h-10 bg-[#062C1A] text-white rounded-xl flex items-center justify-center shadow-lg border border-white/10"
+        aria-label="Open menu"
+      >
+        <Menu className="w-5 h-5" />
+      </button>
+
+      {/* Desktop Sidebar — always visible on lg+ */}
+      <div className="hidden lg:flex w-[280px] shrink-0 h-full">
+        <SidebarContent />
+      </div>
+
+      {/* Mobile Overlay Drawer */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="lg:hidden fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
+              onClick={() => setMobileOpen(false)}
+            />
+            {/* Drawer */}
+            <motion.div
+              key="drawer"
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="lg:hidden fixed top-0 left-0 w-[280px] h-full z-50"
+            >
+              <SidebarContent />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

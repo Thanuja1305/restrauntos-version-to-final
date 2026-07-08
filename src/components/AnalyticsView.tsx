@@ -158,16 +158,17 @@ ${restaurantState.suppliers.map(s => {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#FAFAF8] p-6 overflow-y-auto font-sans select-none animate-fade-in">
+    <div className="flex-1 flex flex-col h-full bg-[#FAFAF8] px-3 py-4 sm:p-6 overflow-y-auto font-sans select-none animate-fade-in">
       
       {/* Page Header */}
       <div className="flex justify-between items-center mb-6">
-        <div>
+        <div className="pl-10 sm:pl-0">
           <h1 className="text-xl font-bold text-[#062C1A] tracking-tight flex items-center gap-2">
             <LineChart className="w-5 h-5 text-[#16A34A]" />
-            <span>AI Restaurant Operations Analytics</span>
+            <span className="hidden sm:inline">AI Restaurant Operations Analytics</span>
+            <span className="sm:hidden">Analytics</span>
           </h1>
-          <p className="text-xs text-zinc-500 mt-0.5">Evaluate live margins, trace ingredient profit markups, analyze active safety violations, and compile business summaries.</p>
+          <p className="hidden sm:block text-xs text-zinc-500 mt-0.5">Evaluate live margins, trace ingredient profit markups, analyze active safety violations, and compile business summaries.</p>
         </div>
       </div>
 

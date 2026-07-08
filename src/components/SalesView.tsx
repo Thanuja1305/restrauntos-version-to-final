@@ -397,16 +397,17 @@ export default function SalesView({
   const { subtotal: draftSubtotal, tax: draftTax, total: draftTotal } = computedDraftTotals();
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#FAFAF8] p-6 overflow-y-auto font-sans select-none animate-fade-in">
+    <div className="flex-1 flex flex-col h-full bg-[#FAFAF8] px-3 py-4 sm:p-6 overflow-y-auto font-sans select-none animate-fade-in">
       
       {/* Top Header */}
       <div className="flex justify-between items-center mb-6">
-        <div>
+        <div className="pl-10 sm:pl-0">
           <h1 className="text-xl font-bold text-[#062C1A] tracking-tight flex items-center gap-2">
             <ShoppingBag className="w-5 h-5 text-[#16A34A]" />
-            <span>Sales, Billing & Invoicing Ledger</span>
+            <span className="hidden sm:inline">Sales, Billing & Invoicing Ledger</span>
+            <span className="sm:hidden">Sales</span>
           </h1>
-          <p className="text-xs text-zinc-500 mt-0.5">Track customer orders, bill grand totals, reconcile invoices, and review printing formats directly from PostgreSQL.</p>
+          <p className="hidden sm:block text-xs text-zinc-500 mt-0.5">Track customer orders, bill grand totals, reconcile invoices, and review printing formats directly from PostgreSQL.</p>
         </div>
         
         <button
@@ -414,10 +415,10 @@ export default function SalesView({
             setIsModalOpen(true);
             if (menu.length > 0) setCurrentMenuItemId(menu[0].id);
           }}
-          className="bg-[#16A34A] hover:bg-[#117534] text-white font-extrabold text-xs px-4.5 py-2.5 rounded-[12px] flex items-center gap-1.5 shadow-sm shadow-emerald-600/15 transition-all cursor-pointer active:scale-95"
+          className="bg-[#16A34A] hover:bg-[#117534] text-white font-extrabold text-xs px-3 sm:px-4.5 py-2.5 rounded-[12px] flex items-center gap-1.5 shadow-sm shadow-emerald-600/15 transition-all cursor-pointer active:scale-95 shrink-0"
         >
           <Plus className="w-4 h-4" />
-          <span>New Sales Billing</span>
+          <span className="hidden sm:inline">New Sales Billing</span>
         </button>
       </div>
 

@@ -226,16 +226,17 @@ export default function InventoryView({
   const activePendingOrders = orders.filter(o => o.status === "Pending");
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#FAFAF8] p-6 overflow-y-auto font-sans select-none animate-fade-in">
+    <div className="flex-1 flex flex-col h-full bg-[#FAFAF8] px-3 py-4 sm:p-6 overflow-y-auto font-sans select-none animate-fade-in">
       
       {/* Module Title */}
       <div className="flex justify-between items-center mb-6">
-        <div>
+        <div className="pl-10 sm:pl-0">
           <h1 className="text-xl font-bold text-[#062C1A] tracking-tight flex items-center gap-2.5">
             <Warehouse className="w-5.5 h-5.5 text-[#16A34A]" />
-            <span>Culinary Supply & Recipe Customization Hub</span>
+            <span className="hidden sm:inline">Culinary Supply &amp; Recipe Customization Hub</span>
+            <span className="sm:hidden">Inventory</span>
           </h1>
-          <p className="text-xs text-zinc-500 mt-0.5">Control safety stock limits, toggle recipe prices, and manage active kitchen order preparation queues in PostgreSQL.</p>
+          <p className="hidden sm:block text-xs text-zinc-500 mt-0.5">Control safety stock limits, toggle recipe prices, and manage active kitchen order preparation queues in PostgreSQL.</p>
         </div>
       </div>
 

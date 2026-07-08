@@ -16,14 +16,15 @@ export default function SettingsView({ onResetDatabase }: SettingsViewProps) {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#FAFAF8] p-6 overflow-y-auto font-sans select-none animate-fade-in">
+    <div className="flex-1 flex flex-col h-full bg-[#FAFAF8] px-3 py-4 sm:p-6 overflow-y-auto font-sans select-none animate-fade-in">
       {/* View Header */}
-      <div className="mb-6">
+      <div className="mb-6 pl-10 sm:pl-0">
         <h1 className="text-xl font-bold text-[#062C1A] tracking-tight flex items-center gap-2">
           <Settings className="w-5 h-5 text-[#16A34A]" />
-          <span>System Settings & Integrations</span>
+          <span className="hidden sm:inline">System Settings &amp; Integrations</span>
+          <span className="sm:hidden">Settings</span>
         </h1>
-        <p className="text-xs text-zinc-500 mt-0.5">Configure restaurant details, test server-side AI connection, manage user permissions, and perform diagnostics.</p>
+        <p className="hidden sm:block text-xs text-zinc-500 mt-0.5">Configure restaurant details, test server-side AI connection, manage user permissions, and perform diagnostics.</p>
       </div>
 
       <div className="max-w-3xl space-y-6">

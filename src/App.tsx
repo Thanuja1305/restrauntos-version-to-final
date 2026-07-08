@@ -206,7 +206,7 @@ export default function App() {
   const renderMainContent = () => {
     if (isLoadingState) {
       return (
-        <div className="flex-1 flex flex-col items-center justify-center bg-[#FAFAF8] text-zinc-400 gap-3">
+        <div className="flex-1 flex flex-col items-center justify-center bg-[#FAFAF8] text-zinc-400 gap-3 pl-0 lg:pl-0">
           <RefreshCw className="w-8 h-8 animate-spin text-emerald-600" />
           <p className="text-xs font-semibold">Booting Restaurant AI Operating System...</p>
         </div>
@@ -298,7 +298,7 @@ export default function App() {
 
   return (
     <div className="w-screen h-screen flex overflow-hidden bg-[#FAFAF8] antialiased">
-      {/* Left Sidebar */}
+      {/* Left Sidebar (handles its own mobile drawer logic) */}
       <Sidebar 
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
@@ -308,15 +308,18 @@ export default function App() {
       />
 
       {/* Main Container */}
-      <main className="flex-1 flex h-full min-w-0 relative">
+      <main className="flex-1 flex h-full min-w-0 relative overflow-hidden">
         {renderMainContent()}
 
-        {/* Right Utility Panel - shown exclusively on AI Agent home tab to give full widescreen spread on other high-density datagrids */}
+        {/* Right Utility Panel - shown exclusively on AI Agent home tab.
+            Hidden on mobile/tablet to prevent overcrowding. */}
         {activeTab === "agent" && (
-          <RightPanel 
-            onTriggerPrompt={handleTriggerPrompt} 
-            restaurantState={restaurantState}
-          />
+          <div className="hidden xl:flex h-full">
+            <RightPanel 
+              onTriggerPrompt={handleTriggerPrompt} 
+              restaurantState={restaurantState}
+            />
+          </div>
         )}
       </main>
     </div>

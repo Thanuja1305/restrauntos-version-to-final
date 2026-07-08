@@ -230,18 +230,18 @@ export default function AgentView({
   return (
     <div className="flex-1 flex flex-col h-full bg-[#FAFAF8] text-zinc-800 font-sans relative overflow-hidden">
       {/* Top Header */}
-      <header className="h-16 border-b border-zinc-200/60 bg-white/80 backdrop-blur-md px-6 flex items-center justify-between shrink-0 z-10">
-        <div className="flex items-center gap-2">
+      <header className="h-16 border-b border-zinc-200/60 bg-white/80 backdrop-blur-md px-4 lg:px-6 flex items-center justify-between shrink-0 z-10">
+        <div className="flex items-center gap-2 pl-10 lg:pl-0">
           <span className="text-xl">👋</span>
           <div>
             <h2 className="text-sm font-bold text-[#062C1A] tracking-tight">Hello, Spice Heaven!</h2>
-            <p className="text-[10px] text-zinc-500 font-semibold tracking-wide">Ask your Restaurant Agent anything. It will manage everything for you.</p>
+            <p className="hidden sm:block text-[10px] text-zinc-500 font-semibold tracking-wide">Ask your Restaurant Agent anything. It will manage everything for you.</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          {/* Live Date display */}
-          <div className="flex items-center gap-2 bg-[#FAFAF8] px-3.5 py-1.5 rounded-[12px] border border-zinc-200/80 text-xs text-[#062C1A] font-bold shadow-xs">
+        <div className="flex items-center gap-2 sm:gap-4">
+          {/* Live Date display — hidden on mobile */}
+          <div className="hidden md:flex items-center gap-2 bg-[#FAFAF8] px-3.5 py-1.5 rounded-[12px] border border-zinc-200/80 text-xs text-[#062C1A] font-bold shadow-xs">
             <Calendar className="w-3.5 h-3.5 text-emerald-600" />
             <span>{getFormattedDate()}</span>
           </div>
@@ -252,20 +252,20 @@ export default function AgentView({
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full border border-white" />
           </div>
 
-          {/* Database Reset connection button */}
+          {/* Database Reset button */}
           <button 
             onClick={onResetDatabase}
-            className="flex items-center gap-1.5 text-[10px] bg-[#FAFAF8] hover:bg-zinc-150 border border-zinc-200 text-zinc-600 font-bold px-3 py-1.5 rounded-[12px] transition-colors shrink-0 cursor-pointer"
+            className="flex items-center gap-1.5 text-[10px] bg-[#FAFAF8] hover:bg-zinc-150 border border-zinc-200 text-zinc-600 font-bold px-2.5 py-1.5 rounded-[12px] transition-colors shrink-0 cursor-pointer"
             title="Reset Database to default state"
           >
             <RefreshCw className="w-3 h-3 text-zinc-400" />
-            <span>Reset DB</span>
+            <span className="hidden sm:inline">Reset DB</span>
           </button>
         </div>
       </header>
 
       {/* Main Conversation Stream */}
-      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 scrollbar-thin scrollbar-thumb-zinc-200 flex flex-col">
+      <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 sm:py-6 space-y-6 scrollbar-thin scrollbar-thumb-zinc-200 flex flex-col">
         
         {/* Empty State: Robot Banner + suggestions Grid */}
         <AnimatePresence mode="wait">
@@ -321,7 +321,7 @@ export default function AgentView({
               {/* Try Asking Me Section */}
               <div className="space-y-4">
                 <div className="text-xs text-[#062C1A] font-bold uppercase tracking-wider pl-1">Try asking me something like...</div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3">
                   {suggestions.map((sug, idx) => (
                     <button
                       key={idx}
@@ -448,7 +448,7 @@ export default function AgentView({
       </div>
 
       {/* Modern Fixed Chat Input Bar */}
-      <footer className="p-6 bg-white border-t border-zinc-200/60 shrink-0">
+      <footer className="p-3 sm:p-6 bg-white border-t border-zinc-200/60 shrink-0">
         <form onSubmit={handleSubmit} className="max-w-4xl mx-auto relative flex flex-col gap-2">
           
           {/* Main Rounded Input Frame */}

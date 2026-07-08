@@ -46,23 +46,24 @@ export default function FinanceView({ finances, onAddLog }: FinanceViewProps) {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#FAFAF8] p-6 overflow-y-auto font-sans select-none animate-fade-in">
+    <div className="flex-1 flex flex-col h-full bg-[#FAFAF8] px-3 py-4 sm:p-6 overflow-y-auto font-sans select-none animate-fade-in">
       {/* View Header */}
       <div className="flex justify-between items-center mb-6">
-        <div>
+        <div className="pl-10 sm:pl-0">
           <h1 className="text-xl font-bold text-[#062C1A] tracking-tight flex items-center gap-2">
             <Coins className="w-5 h-5 text-[#16A34A]" />
-            <span>Operational Cash Flow Ledger</span>
+            <span className="hidden sm:inline">Operational Cash Flow Ledger</span>
+            <span className="sm:hidden">Finance</span>
           </h1>
-          <p className="text-xs text-zinc-500 mt-0.5">High-density spreadsheet tracking credits (sales, order bills) and debits (supplier settlements, rent, kitchen operations).</p>
+          <p className="hidden sm:block text-xs text-zinc-500 mt-0.5">High-density spreadsheet tracking credits (sales, order bills) and debits (supplier settlements, rent, kitchen operations).</p>
         </div>
         
         <button
           onClick={handleLogManualTransaction}
-          className="bg-[#16A34A] hover:bg-[#117534] text-white font-bold text-xs px-4 py-2 rounded-[12px] flex items-center gap-1.5 shadow-sm shadow-emerald-600/10 transition-all cursor-pointer active:scale-95 animate-fade-in"
+          className="bg-[#16A34A] hover:bg-[#117534] text-white font-bold text-xs px-3 sm:px-4 py-2 rounded-[12px] flex items-center gap-1.5 shadow-sm shadow-emerald-600/10 transition-all cursor-pointer active:scale-95 animate-fade-in shrink-0"
         >
           <Plus className="w-4 h-4" />
-          <span>Manual Entry Log</span>
+          <span className="hidden sm:inline">Manual Entry Log</span>
         </button>
       </div>
 
