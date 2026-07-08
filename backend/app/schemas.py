@@ -129,11 +129,23 @@ class OrderSchema(BaseModel):
     class Config:
         populate_by_name = True
 
+class OrderItemCreate(BaseModel):
+    menuItemId: str
+    name: str
+    price: float
+    quantity: int
+
 class OrderCreateRequest(BaseModel):
-    customerId: Optional[str] = None
-    customerName: Optional[str] = None
-    items: List[OrderItemSchema]
+    customerId: Optional[str] = Field(alias="customer_id", default=None)
+    customerName: Optional[str] = Field(alias="customer_name", default=None)
+    phone: Optional[str] = None
+    tableOrType: Optional[str] = Field(alias="table_or_type", default="Table 1")
+    items: List[OrderItemCreate]
     discount: float = 0.0
+    status: Optional[str] = "pending"
+
+    class Config:
+        populate_by_name = True
 
 # Customers
 class CustomerSchema(BaseModel):

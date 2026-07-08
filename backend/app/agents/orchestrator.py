@@ -97,7 +97,13 @@ class OrchestratorAgent:
                     "averageOrderValue": summary["averageOrderValue"],
                     "topSellingItem": "Masala Dosa (18)"
                 }
-                agent_response_text = "Here is today's sales summary. We are recording a very steady footfall with high average check size!"
+                agent_response_text = (
+                    "Here is today's sales summary:\n\n"
+                    f"- **Total Orders Today**: {summary['totalOrders']}\n"
+                    f"- **Net Revenue**: ₹{summary['totalRevenue']:.2f}\n"
+                    f"- **Average Order Value (AOV)**: ₹{summary['averageOrderValue']:.2f}\n"
+                    "- **Top Selling Item**: Masala Dosa"
+                )
 
         elif specialist == "inventory":
             # Check if user requests adjustment
@@ -116,7 +122,14 @@ class OrchestratorAgent:
                         "stock": f"{item['currentStock']} {item['unitOfMeasure']}"
                     } for item in low_items
                 ]
-                agent_response_text = "I've detected multiple inventory ingredients falling below their target minimum threshold. Please inspect the list below:"
+                if low_items:
+                    agent_response_text = "I've detected multiple inventory ingredients falling below their target minimum threshold. Please inspect the list below:\n\n"
+                    agent_response_text += "| Ingredient | Current Stock | Reorder Level | Unit |\n"
+                    agent_response_text += "| :--- | :--- | :--- | :--- |\n"
+                    for item in low_items:
+                        agent_response_text += f"| **{item['ingredientName']}** | {item['currentStock']} | {item['minStockLevel']} | {item['unitOfMeasure']} |\n"
+                else:
+                    agent_response_text = "✔ **All ingredients are fully stocked!** No low stock warnings currently."
 
         elif specialist == "finance":
             if any(kw in normalized_query for kw in ["settle", "pay dairy craft", "pay supplier"]):
@@ -136,7 +149,7 @@ class OrchestratorAgent:
             logger.info("[Orchestrator Agent -> Analytics Agent] Fetching financial analytics report")
             fin = await AnalyticsAgent.get_financial_overview()
             agent_response_text = (
-                f"Here is the financial summary for Spice Heaven:\n"
+                f"Here is the financial summary for Spice Heaven:\n\n"
                 f"- **Total Revenue**: {fin['currency']}{fin['totalRevenue']}\n"
                 f"- **Total Expenses**: {fin['currency']}{fin['totalExpenses']}\n"
                 f"- **Net Profit**: {fin['currency']}{fin['profit']}\n"

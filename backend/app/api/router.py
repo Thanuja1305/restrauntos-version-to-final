@@ -90,18 +90,33 @@ async def add_customer(data: Dict[str, Any], user: Dict[str, Any] = Depends(Auth
 # ==========================================
 @router.get("/orders", response_model=List[schemas.OrderSchema])
 async def get_orders(user: Dict[str, Any] = Depends(AuthAgent.verify_token)):
-    return await SalesAgent.get_orders()
+    raw = await SalesAgent.get_orders()
+    return [map_order(o) for o in raw]
 
 @router.post("/orders", response_model=schemas.OrderSchema)
 async def create_order(payload: schemas.OrderCreateRequest, user: Dict[str, Any] = Depends(AuthAgent.verify_token)):
-    items_dict = [item.model_dump(by_alias=True) for item in payload.items]
-    return await SalesAgent.create_order(
+    items_dict = []
+    for item in payload.items:
+        items_dict.append({
+            "menuItemId": item.menuItemId,
+            "name": item.name,
+            "quantity": item.quantity,
+            "price": item.price,
+            "unitPrice": item.price
+        })
+    created = await SalesAgent.create_order(
         payload.customerId, 
         payload.customerName, 
         items_dict, 
         payload.discount, 
         user["id"]
     )
+    if payload.tableOrType:
+        created["table_or_type"] = payload.tableOrType
+    if payload.status:
+        created["status"] = payload.status
+        
+    return map_order(created)
 
 # ==========================================
 # NOTIFICATIONS ENDPOINTS
@@ -193,9 +208,15 @@ def map_order(o: Dict[str, Any]) -> Dict[str, Any]:
     items = []
     for it in raw_items:
         items.append({
-            "menuItemId": it.get("menuItemId") or it.get("menu_item_id") or it.get("menuId") or "",
-            "name": it.get("name") or it.get("menu_name") or it.get("menuName") or "Unnamed",
+            "id": str(it.get("id") or f"item_{int(datetime.datetime.utcnow().timestamp())}"),
+            "menuId": str(it.get("menuItemId") or it.get("menuId") or it.get("menu_id") or ""),
+            "menuName": str(it.get("name") or it.get("menuName") or it.get("menu_name") or "Unnamed"),
             "quantity": int(it.get("quantity") or 1),
+            "unitPrice": float(it.get("price") or it.get("unitPrice") or it.get("unit_price") or 0.0),
+            
+            # frontend fields
+            "menuItemId": str(it.get("menuItemId") or it.get("menuId") or it.get("menu_id") or ""),
+            "name": str(it.get("name") or it.get("menuName") or it.get("menu_name") or "Unnamed"),
             "price": float(it.get("price") or it.get("unitPrice") or it.get("unit_price") or 0.0)
         })
     
@@ -204,15 +225,20 @@ def map_order(o: Dict[str, Any]) -> Dict[str, Any]:
     
     return {
         "id": str(o.get("id")),
-        "customerName": o.get("customerName") or o.get("customer_name") or "Guest Customer",
-        "phone": o.get("phone") or "",
-        "tableOrType": o.get("tableOrType") or o.get("table_or_type") or "Table 1",
+        "customerId": str(o.get("customer_id") or o.get("customerId") or ""),
+        "customerName": str(o.get("customerName") or o.get("customer_name") or "Guest Customer"),
+        "phone": str(o.get("phone") or ""),
+        "tableOrType": str(o.get("tableOrType") or o.get("table_or_type") or "Table 1"),
+        "userId": str(o.get("user_id") or o.get("userId") or "staff_id"),
+        "serverName": str(o.get("server_name") or o.get("serverName") or "AI POS Gate"),
+        "status": status,
         "items": items,
         "subtotal": float(o.get("subtotal") or 0.0),
         "tax": float(o.get("tax") or 0.0),
+        "discount": float(o.get("discount") or 0.0),
         "total": float(o.get("total") or 0.0),
-        "status": status,
-        "timestamp": o.get("created_at") or o.get("createdAt") or datetime.datetime.utcnow().isoformat()
+        "createdAt": str(o.get("created_at") or o.get("createdAt") or datetime.datetime.utcnow().isoformat()),
+        "timestamp": str(o.get("created_at") or o.get("createdAt") or datetime.datetime.utcnow().isoformat())
     }
 
 def map_customer(c: Dict[str, Any]) -> Dict[str, Any]:
