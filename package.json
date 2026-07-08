@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:backend": "python backend/run_supervisor.py",
     "build": "vite build",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"
