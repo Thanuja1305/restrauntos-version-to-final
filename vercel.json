@@ -2,10 +2,6 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/index.py",
-      "use": "@vercel/python"
-    },
-    {
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
@@ -15,8 +11,8 @@
   ],
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.py"
+      "source": "/api/:path*",
+      "destination": "https://restrauntos-version-to-final.onrender.com/api/:path*"
     },
     {
       "source": "/((?!api/).*)",
