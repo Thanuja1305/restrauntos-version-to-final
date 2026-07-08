@@ -263,9 +263,9 @@ Revenue KPI cards, profit margin analysis, top-selling items, and operational he
 
 ---
 
-## 👥 Team
+## 👥 Team — Prompt Orchestrators
 
-Built with 💚 by a passionate team for the AI Hackathon:
+Built with 💚 by **Team Prompt Orchestrators** for the AI Hackathon:
 
 | Name | Role |
 |---|---|
@@ -292,7 +292,7 @@ Built with 💚 by a passionate team for the AI Hackathon:
 
 **Built with ❤️ for the AI Hackathon**
 
-*Team RestaurantOS — Thanuja · Shivani · Akshitha · Srija*
+*Team Prompt Orchestrators — Thanuja · Shivani · Akshitha · Srija*
 
 [🚀 Live Demo](https://restrauntos-version-to-final.vercel.app) • [🐛 Report Bug](https://github.com/Thanuja1305/restrauntos-version-to-final/issues) • [💡 Request Feature](https://github.com/Thanuja1305/restrauntos-version-to-final/issues)
 
