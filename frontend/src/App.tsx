@@ -101,7 +101,7 @@ export default function App() {
         const data = await res.json();
         setRestaurantState(data.state);
         // Add status log
-        setMessages(prev => [
+        setMessages((prev: ChatMessage[]) => [
           ...prev,
           {
             id: `reset-${Date.now()}`,
@@ -149,7 +149,7 @@ export default function App() {
       timestamp: new Date().toISOString()
     };
 
-    setMessages(prev => [...prev, userMsg]);
+    setMessages((prev: ChatMessage[]) => [...prev, userMsg]);
     setIsSending(true);
 
     try {
@@ -171,7 +171,7 @@ export default function App() {
           text: data.reply,
           timestamp: new Date().toISOString()
         };
-        setMessages(prev => [...prev, aiMsg]);
+        setMessages((prev: ChatMessage[]) => [...prev, aiMsg]);
         if (data.updatedState) {
           setRestaurantState(data.updatedState);
         }
@@ -181,7 +181,7 @@ export default function App() {
     } catch (err) {
       console.error("Error communicating with AI Agent:", err);
       // Fallback fallback response
-      setMessages(prev => [
+      setMessages((prev: ChatMessage[]) => [
         ...prev,
         {
           id: `ai-err-${Date.now()}`,
@@ -231,10 +231,10 @@ export default function App() {
             suppliers={restaurantState.suppliers}
             menu={restaurantState.menu}
             orders={restaurantState.orders}
-            onUpdateInventory={(inventory) => syncStateWithServer({ ...restaurantState, inventory })}
-            onUpdateMenu={(menu) => syncStateWithServer({ ...restaurantState, menu })}
-            onUpdateOrders={(orders) => syncStateWithServer({ ...restaurantState, orders })}
-            onUpdateState={(updatedState) => syncStateWithServer(updatedState)}
+            onUpdateInventory={(inventory: InventoryItem[]) => syncStateWithServer({ ...restaurantState, inventory })}
+            onUpdateMenu={(menu: MenuItem[]) => syncStateWithServer({ ...restaurantState, menu })}
+            onUpdateOrders={(orders: Order[]) => syncStateWithServer({ ...restaurantState, orders })}
+            onUpdateState={(updatedState: RestaurantState) => syncStateWithServer(updatedState)}
             onAddLog={handleAddFinancialLog}
           />
         );
@@ -245,8 +245,8 @@ export default function App() {
             menu={restaurantState.menu}
             customers={restaurantState.customers}
             inventory={restaurantState.inventory}
-            onUpdateState={(updatedState) => syncStateWithServer(updatedState)}
-            onUpdateOrders={(orders) => syncStateWithServer({ ...restaurantState, orders })}
+            onUpdateState={(updatedState: RestaurantState) => syncStateWithServer(updatedState)}
+            onUpdateOrders={(orders: Order[]) => syncStateWithServer({ ...restaurantState, orders })}
             onAddLog={handleAddFinancialLog}
             setActiveTab={setActiveTab}
           />
