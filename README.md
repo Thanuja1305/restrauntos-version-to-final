@@ -271,7 +271,7 @@ Built with 💚 by **Team Prompt Orchestrators** for the AI Hackathon:
 |---|---|
 | 👩‍💻 **Thanuja** | Full-Stack Lead · AI Integration · Backend Architecture |
 | 👩‍💻 **Shivani Gundlapalli** | Frontend Development · UI/UX Design |
-| 👩‍💻 **Akshitha Kota** | Backend Development · Database & API |
+| 👩‍💻 **Akshitha Kotha** | Backend Development · Database & API |
 | 👩‍💻 **Srija Reddy Mamidi** | AI Agent Design · Testing & QA |
 
 ---
@@ -292,7 +292,7 @@ Built with 💚 by **Team Prompt Orchestrators** for the AI Hackathon:
 
 **Built with ❤️ for the AI Hackathon**
 
-*Team Prompt Orchestrators — Thanuja · Shivani · Akshitha · Srija*
+*Team Prompt Orchestrators — Thanuja · Shivani · AkshithaKrishna · Srija*
 
 [🚀 Live Demo](https://restrauntos-version-to-final.vercel.app) • [🐛 Report Bug](https://github.com/Thanuja1305/restrauntos-version-to-final/issues) • [💡 Request Feature](https://github.com/Thanuja1305/restrauntos-version-to-final/issues)
 
